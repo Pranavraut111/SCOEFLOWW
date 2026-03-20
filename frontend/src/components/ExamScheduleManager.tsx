@@ -99,7 +99,7 @@ const ExamScheduleManager = ({ examEvent, onNavigateToEnrollment }: ExamSchedule
 
   const fetchEligibleStudentsCount = async () => {
     try {
-      const response = await fetch(`/api/v1/students/`);
+      const response = await fetch(import.meta.env.VITE_API_URL + `/api/v1/students/`);
       if (response.ok) {
         const data = await response.json();
         // Filter students by semester and department
@@ -124,7 +124,7 @@ const ExamScheduleManager = ({ examEvent, onNavigateToEnrollment }: ExamSchedule
   const fetchSchedules = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/v1/exams/events/${examEvent.id}/schedules/`);
+      const response = await fetch(import.meta.env.VITE_API_URL + `/api/v1/exams/events/${examEvent.id}/schedules/`);
       if (response.ok) {
         const data = await response.json();
         setSchedules(data);
@@ -151,7 +151,7 @@ const ExamScheduleManager = ({ examEvent, onNavigateToEnrollment }: ExamSchedule
       const romanSemester = semesterToRoman(examEvent.semester);
       
       // Fetch subjects by department and semester (don't filter by year — year format may differ)
-      const response = await fetch(`/api/v1/subjects/?department=${encodeURIComponent(examEvent.department)}&semester=${romanSemester}`);
+      const response = await fetch(import.meta.env.VITE_API_URL + `/api/v1/subjects/?department=${encodeURIComponent(examEvent.department)}&semester=${romanSemester}`);
       if (response.ok) {
         const data = await response.json();
         console.log('Subjects received:', data);
@@ -159,7 +159,7 @@ const ExamScheduleManager = ({ examEvent, onNavigateToEnrollment }: ExamSchedule
         
         if (data.length === 0) {
           // Fallback: try fetching all and filtering on frontend  
-          const fallbackResponse = await fetch('/api/v1/subjects/');
+          const fallbackResponse = await fetch(import.meta.env.VITE_API_URL + '/api/v1/subjects/');
           if (fallbackResponse.ok) {
             const fallbackData = await fallbackResponse.json();
             const filteredSubjects = fallbackData.filter((subject: any) => 
@@ -325,7 +325,7 @@ const ExamScheduleManager = ({ examEvent, onNavigateToEnrollment }: ExamSchedule
     if (!confirm('Are you sure you want to delete this schedule?')) return;
 
     try {
-      const response = await fetch(`/api/v1/exams/schedules/${scheduleId}`, {
+      const response = await fetch(import.meta.env.VITE_API_URL + `/api/v1/exams/schedules/${scheduleId}`, {
         method: 'DELETE',
       });
 
@@ -355,7 +355,7 @@ const ExamScheduleManager = ({ examEvent, onNavigateToEnrollment }: ExamSchedule
     try {
       // Delete all schedules one by one
       const deletePromises = schedules.map(schedule =>
-        fetch(`/api/v1/exams/schedules/${schedule.id}`, {
+        fetch(import.meta.env.VITE_API_URL + `/api/v1/exams/schedules/${schedule.id}`, {
           method: 'DELETE',
         })
       );
@@ -934,7 +934,7 @@ const BulkScheduleForm = ({ examEvent, subjects, existingSchedules, onSuccess, o
 
           console.log('Sending payload for', schedule.subject_code, ':', payload);
 
-          const response = await fetch(`/api/v1/exams/events/${examEvent.id}/schedules/`, {
+          const response = await fetch(import.meta.env.VITE_API_URL + `/api/v1/exams/events/${examEvent.id}/schedules/`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

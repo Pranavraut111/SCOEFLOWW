@@ -206,7 +206,7 @@ const StudentPortal = () => {
   const loadChatHistory = async () => {
     if (!student) return;
     try {
-      const r = await axios.get(`/api/v1/chat/history/${student.id}`);
+      const r = await axios.get(import.meta.env.VITE_API_URL + `/api/v1/chat/history/${student.id}`);
       if (r.data.messages && r.data.messages.length > 0) {
         const history = r.data.messages.map((m: any) => ({ role: m.role, text: m.text }));
         setChatMessages([{ role: 'bot', text: 'Hi! I am the SCOE Campus Assistant. Ask me anything about our college - locations, departments, clubs, facilities, or campus navigation!' }, ...history]);
@@ -217,7 +217,7 @@ const StudentPortal = () => {
   const clearChatHistory = async () => {
     if (!student) return;
     try {
-      await axios.delete(`/api/v1/chat/history/${student.id}`);
+      await axios.delete(import.meta.env.VITE_API_URL + `/api/v1/chat/history/${student.id}`);
       setChatMessages([{ role: 'bot', text: 'Hi! I am the SCOE Campus Assistant. Ask me anything about our college - locations, departments, clubs, facilities, or campus navigation!' }]);
     } catch {}
   };
@@ -226,7 +226,7 @@ const StudentPortal = () => {
     if (!student || recommendations) return;
     setLoadingRecs(true);
     try {
-      const r = await axios.get(`/api/v1/chat/recommendations/${student.id}`);
+      const r = await axios.get(import.meta.env.VITE_API_URL + `/api/v1/chat/recommendations/${student.id}`);
       if (r.data.recommendations) setRecommendations(r.data.recommendations);
     } catch {}
     finally { setLoadingRecs(false); }
@@ -243,8 +243,8 @@ const StudentPortal = () => {
     setLoadingClubs(true);
     try {
       const [clubsRes, joinedRes] = await Promise.all([
-        axios.get('/api/v1/campus/clubs'),
-        axios.get(`/api/v1/campus/student/${student.id}/clubs`)
+        axios.get(import.meta.env.VITE_API_URL + '/api/v1/campus/clubs'),
+        axios.get(import.meta.env.VITE_API_URL + `/api/v1/campus/student/${student.id}/clubs`)
       ]);
       setAllClubs(clubsRes.data || []);
       setJoinedClubIds((joinedRes.data || []).map((c: any) => c.id));
@@ -257,8 +257,8 @@ const StudentPortal = () => {
     setLoadingEvents(true);
     try {
       const [eventsRes, regRes] = await Promise.all([
-        axios.get('/api/v1/campus/events'),
-        axios.get(`/api/v1/campus/student/${student.id}/events`)
+        axios.get(import.meta.env.VITE_API_URL + '/api/v1/campus/events'),
+        axios.get(import.meta.env.VITE_API_URL + `/api/v1/campus/student/${student.id}/events`)
       ]);
       setAllEvents(eventsRes.data || []);
       setRegisteredEventIds((regRes.data || []).map((e: any) => e.id));
@@ -269,7 +269,7 @@ const StudentPortal = () => {
   const handleJoinClub = async (clubId: string) => {
     if (!student) return;
     try {
-      const res = await axios.post(`/api/v1/campus/clubs/${clubId}/join`, { student_id: student.id });
+      const res = await axios.post(import.meta.env.VITE_API_URL + `/api/v1/campus/clubs/${clubId}/join`, { student_id: student.id });
       if (res.data.already_joined) {
         toast({ title: 'Already Joined', description: 'You are already a member of this club.' });
       } else {
@@ -285,7 +285,7 @@ const StudentPortal = () => {
   const handleLeaveClub = async (clubId: string) => {
     if (!student) return;
     try {
-      await axios.post(`/api/v1/campus/clubs/${clubId}/leave`, { student_id: student.id });
+      await axios.post(import.meta.env.VITE_API_URL + `/api/v1/campus/clubs/${clubId}/leave`, { student_id: student.id });
       toast({ title: 'Left Club', description: 'You have left this club.' });
       setJoinedClubIds(prev => prev.filter(id => id !== clubId));
       fetchClubs();
@@ -297,7 +297,7 @@ const StudentPortal = () => {
   const handleAttendEvent = async (eventId: string) => {
     if (!student) return;
     try {
-      const res = await axios.post(`/api/v1/campus/events/${eventId}/attend`, { student_id: student.id });
+      const res = await axios.post(import.meta.env.VITE_API_URL + `/api/v1/campus/events/${eventId}/attend`, { student_id: student.id });
       if (res.data.already_attended) {
         toast({ title: 'Already Registered', description: 'You are already registered for this event.' });
       } else {
@@ -325,7 +325,7 @@ const StudentPortal = () => {
   const checkOnboarding = async () => {
     if (!student) return;
     try {
-      const r = await axios.get(`/api/v1/students/personality/${student.id}`);
+      const r = await axios.get(import.meta.env.VITE_API_URL + `/api/v1/students/personality/${student.id}`);
       if (r.data.has_completed_onboarding) {
         setHasCompletedOnboarding(true);
         setPersonalityProfile(r.data);
@@ -342,7 +342,7 @@ const StudentPortal = () => {
   const fetchPublishedResults = async () => {
     if (!student) return;
     try {
-      const r = await axios.get(`/api/v1/results/student/${student.id}/published`);
+      const r = await axios.get(import.meta.env.VITE_API_URL + `/api/v1/results/student/${student.id}/published`);
       setPublishedResults(r.data || []);
     } catch {}
   };
@@ -362,7 +362,7 @@ const StudentPortal = () => {
     if (!student) return;
     setIsLoading(true);
     try {
-      await axios.post(`/api/v1/students/personality/${student.id}`, onboardingAnswers);
+      await axios.post(import.meta.env.VITE_API_URL + `/api/v1/students/personality/${student.id}`, onboardingAnswers);
       setHasCompletedOnboarding(true);
       setShowOnboarding(false);
       setPersonalityProfile(onboardingAnswers);
@@ -381,7 +381,7 @@ const StudentPortal = () => {
     setChatMessages(prev => [...prev, { role: 'user', text: msg }]);
     setIsSending(true);
     try {
-      const r = await axios.post('/api/v1/chat/ask', {
+      const r = await axios.post(import.meta.env.VITE_API_URL + '/api/v1/chat/ask', {
         student_id: student.id,
         message: msg
       });
@@ -397,7 +397,7 @@ const StudentPortal = () => {
     if (!student) return;
     try {
       setIsLoading(true);
-      const response = await axios.get(`/api/v1/results/detailed-result-sheet/${student.id}?academic_year=2025-26&semester=${student.current_semester || 2}`);
+      const response = await axios.get(import.meta.env.VITE_API_URL + `/api/v1/results/detailed-result-sheet/${student.id}?academic_year=2025-26&semester=${student.current_semester || 2}`);
       if (response.data?.subjects) {
         const data = response.data; const subjects = data.subjects; const summary = data.semester_summary;
         const rows: any[] = [['Roll','Name','Code','Subject','Credits','IA','Viva','ESE','Total','%','Grade','Status','SGPA','CGPA','Class']];
@@ -421,7 +421,7 @@ const StudentPortal = () => {
     if (!email.trim() || !password.trim()) { toast({ title: 'Enter credentials', variant: 'destructive' }); return; }
     setIsLoading(true);
     try {
-      const r = await axios.post('/api/v1/students/auth/login', { institutional_email: email, password });
+      const r = await axios.post(import.meta.env.VITE_API_URL + '/api/v1/students/auth/login', { institutional_email: email, password });
       if (r.data.student) { setStudent(r.data.student); toast({ title: `Welcome, ${r.data.student.first_name}!` }); }
     } catch (e: any) { toast({ title: 'Login failed', description: e.response?.data?.detail || 'Default: Student@123', variant: 'destructive' }); }
     finally { setIsLoading(false); }
@@ -432,7 +432,7 @@ const StudentPortal = () => {
     if (newPassword !== confirmPassword) { toast({ title: 'Passwords do not match', variant: 'destructive' }); return; }
     if (newPassword.length < 8) { toast({ title: 'Min 8 chars', variant: 'destructive' }); return; }
     try {
-      await axios.post(`/api/v1/students/auth/change-password?student_id=${student?.id}`, { old_password: oldPassword, new_password: newPassword });
+      await axios.post(import.meta.env.VITE_API_URL + `/api/v1/students/auth/change-password?student_id=${student?.id}`, { old_password: oldPassword, new_password: newPassword });
       toast({ title: 'Password changed!' }); setShowChangePassword(false); setOldPassword(''); setNewPassword(''); setConfirmPassword('');
     } catch (e: any) { toast({ title: 'Failed', description: e.response?.data?.detail, variant: 'destructive' }); }
   };

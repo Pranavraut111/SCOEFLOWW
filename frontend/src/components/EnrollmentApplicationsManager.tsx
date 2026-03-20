@@ -72,7 +72,7 @@ const EnrollmentApplicationsManager = ({ examEvent, adminEmail }: EnrollmentAppl
 
   const fetchExamSchedules = async () => {
     try {
-      const response = await axios.get(`/api/v1/exams/events/${examEvent.id}/schedules/`);
+      const response = await axios.get(import.meta.env.VITE_API_URL + `/api/v1/exams/events/${examEvent.id}/schedules/`);
       setExamSchedules(response.data);
     } catch (error) {
       console.error('Error fetching exam schedules:', error);
@@ -179,7 +179,7 @@ const EnrollmentApplicationsManager = ({ examEvent, adminEmail }: EnrollmentAppl
     }
 
     try {
-      await axios.delete(`/api/v1/enrollment-applications/application/${applicationId}`);
+      await axios.delete(import.meta.env.VITE_API_URL + `/api/v1/enrollment-applications/application/${applicationId}`);
 
       toast({
         title: "Application deleted",

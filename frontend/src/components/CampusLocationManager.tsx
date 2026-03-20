@@ -34,7 +34,7 @@ const CampusLocationManager = () => {
 
   const loadLocations = async () => {
     try {
-      const res = await axios.get('/api/v1/campus/locations');
+      const res = await axios.get(import.meta.env.VITE_API_URL + '/api/v1/campus/locations');
       setLocations(res.data || []);
     } catch (error) { console.error('Error:', error); }
   };
@@ -47,10 +47,10 @@ const CampusLocationManager = () => {
     setIsLoading(true);
     try {
       if (editingLoc) {
-        await axios.put(`/api/v1/campus/locations/${editingLoc.id}`, form);
+        await axios.put(import.meta.env.VITE_API_URL + `/api/v1/campus/locations/${editingLoc.id}`, form);
         toast({ title: "Location updated!" });
       } else {
-        await axios.post('/api/v1/campus/locations', form);
+        await axios.post(import.meta.env.VITE_API_URL + '/api/v1/campus/locations', form);
         toast({ title: "Location added! 📍" });
       }
       setShowForm(false);
@@ -65,7 +65,7 @@ const CampusLocationManager = () => {
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this location?')) return;
     try {
-      await axios.delete(`/api/v1/campus/locations/${id}`);
+      await axios.delete(import.meta.env.VITE_API_URL + `/api/v1/campus/locations/${id}`);
       toast({ title: "Location deleted" });
       loadLocations();
     } catch (error) {

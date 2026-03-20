@@ -60,7 +60,7 @@ const ComponentMarksEntrySimple = ({ examEvent }: ComponentMarksEntrySimpleProps
 
   const loadSubjects = async () => {
     try {
-      const response = await fetch(`/api/v1/exams/events/${examEvent.id}/schedules/`);
+      const response = await fetch(import.meta.env.VITE_API_URL + `/api/v1/exams/events/${examEvent.id}/schedules/`);
       if (response.ok) {
         const schedules = await response.json();
         const subjectList = schedules.map((s: any) => ({
@@ -155,7 +155,7 @@ const ComponentMarksEntrySimple = ({ examEvent }: ComponentMarksEntrySimpleProps
       const subjectDetails = await Promise.all(
         subjects.map(async (subject) => {
           try {
-            const response = await fetch(`/api/v1/subjects/${subject.id}`);
+            const response = await fetch(import.meta.env.VITE_API_URL + `/api/v1/subjects/${subject.id}`);
             if (response.ok) {
               const subjectData = await response.json();
               const components = subjectData.components || subjectData.subject_components || [];
@@ -243,7 +243,7 @@ const ComponentMarksEntrySimple = ({ examEvent }: ComponentMarksEntrySimpleProps
           const subject = subjects.find(s => s.subject_code === subjectCode.trim());
           if (subject) {
             try {
-              const response = await fetch(`/api/v1/subjects/${subject.id}`);
+              const response = await fetch(import.meta.env.VITE_API_URL + `/api/v1/subjects/${subject.id}`);
               if (response.ok) {
                 const subjectData = await response.json();
                 const components = subjectData.components || subjectData.subject_components || [];
@@ -357,7 +357,7 @@ const ComponentMarksEntrySimple = ({ examEvent }: ComponentMarksEntrySimpleProps
         if (!subject) continue;
         
         // Get component for this subject
-        const subjectResponse = await fetch(`/api/v1/subjects/${subject.id}`);
+        const subjectResponse = await fetch(import.meta.env.VITE_API_URL + `/api/v1/subjects/${subject.id}`);
         if (!subjectResponse.ok) continue;
         
         const subjectData = await subjectResponse.json();
@@ -389,7 +389,7 @@ const ComponentMarksEntrySimple = ({ examEvent }: ComponentMarksEntrySimpleProps
         
         // Save marks for this subject
         if (marksEntries.length > 0) {
-          const response = await fetch('/api/v1/results/marks/component/bulk', {
+          const response = await fetch(import.meta.env.VITE_API_URL + '/api/v1/results/marks/component/bulk', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

@@ -42,8 +42,8 @@ const EventManagement = () => {
   const loadData = async () => {
     try {
       const [eventsRes, clubsRes] = await Promise.all([
-        axios.get('/api/v1/campus/events'),
-        axios.get('/api/v1/campus/clubs')
+        axios.get(import.meta.env.VITE_API_URL + '/api/v1/campus/events'),
+        axios.get(import.meta.env.VITE_API_URL + '/api/v1/campus/clubs')
       ]);
       setEvents(eventsRes.data || []);
       setClubs(clubsRes.data || []);
@@ -58,10 +58,10 @@ const EventManagement = () => {
     setIsLoading(true);
     try {
       if (editingEvent) {
-        await axios.put(`/api/v1/campus/events/${editingEvent.id}`, form);
+        await axios.put(import.meta.env.VITE_API_URL + `/api/v1/campus/events/${editingEvent.id}`, form);
         toast({ title: "Event updated!" });
       } else {
-        await axios.post('/api/v1/campus/events', form);
+        await axios.post(import.meta.env.VITE_API_URL + '/api/v1/campus/events', form);
         toast({ title: "Event created! 🎉" });
       }
       setShowForm(false);
@@ -76,7 +76,7 @@ const EventManagement = () => {
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this event?')) return;
     try {
-      await axios.delete(`/api/v1/campus/events/${id}`);
+      await axios.delete(import.meta.env.VITE_API_URL + `/api/v1/campus/events/${id}`);
       toast({ title: "Event deleted" });
       loadData();
     } catch (error) {

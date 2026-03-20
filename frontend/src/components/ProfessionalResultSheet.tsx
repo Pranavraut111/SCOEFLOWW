@@ -54,19 +54,19 @@ const ProfessionalResultSheet = ({ studentId, semester, academicYear }: Props) =
     setIsLoading(true);
     try {
       // Fetch semester result
-      const semResponse = await fetch(`/api/v1/results/semester/${studentId}/${semester}?academic_year=${academicYear}`);
+      const semResponse = await fetch(import.meta.env.VITE_API_URL + `/api/v1/results/semester/${studentId}/${semester}?academic_year=${academicYear}`);
       if (!semResponse.ok) return;
       
       const semData = await semResponse.json();
       
       // Fetch student details
-      const studentResponse = await fetch(`/api/v1/students/${studentId}`);
+      const studentResponse = await fetch(import.meta.env.VITE_API_URL + `/api/v1/students/${studentId}`);
       if (!studentResponse.ok) return;
       
       const studentData = await studentResponse.json();
       
       // Fetch subject results
-      const subjectsResponse = await fetch(`/api/v1/results/subject/student/${studentId}?academic_year=${academicYear}&semester=${semester}`);
+      const subjectsResponse = await fetch(import.meta.env.VITE_API_URL + `/api/v1/results/subject/student/${studentId}?academic_year=${academicYear}&semester=${semester}`);
       if (!subjectsResponse.ok) return;
       
       const subjectsData = await subjectsResponse.json();

@@ -32,7 +32,7 @@ const ClubManagement = () => {
 
   const loadClubs = async () => {
     try {
-      const res = await axios.get('/api/v1/campus/clubs');
+      const res = await axios.get(import.meta.env.VITE_API_URL + '/api/v1/campus/clubs');
       setClubs(res.data || []);
     } catch (error) { console.error('Error loading clubs:', error); }
   };
@@ -45,10 +45,10 @@ const ClubManagement = () => {
     setIsLoading(true);
     try {
       if (editingClub) {
-        await axios.put(`/api/v1/campus/clubs/${editingClub.id}`, form);
+        await axios.put(import.meta.env.VITE_API_URL + `/api/v1/campus/clubs/${editingClub.id}`, form);
         toast({ title: "Club updated!" });
       } else {
-        await axios.post('/api/v1/campus/clubs', form);
+        await axios.post(import.meta.env.VITE_API_URL + '/api/v1/campus/clubs', form);
         toast({ title: "Club created! 🎉" });
       }
       setShowForm(false);
@@ -63,7 +63,7 @@ const ClubManagement = () => {
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this club?')) return;
     try {
-      await axios.delete(`/api/v1/campus/clubs/${id}`);
+      await axios.delete(import.meta.env.VITE_API_URL + `/api/v1/campus/clubs/${id}`);
       toast({ title: "Club deleted" });
       loadClubs();
     } catch (error) {

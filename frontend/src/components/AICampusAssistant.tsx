@@ -64,7 +64,7 @@ const AICampusAssistant = ({ studentId, studentName }: AICampusAssistantProps) =
     setIsLoading(true);
 
     try {
-      const response = await axios.post('/api/v1/assistant/chat', {
+      const response = await axios.post(import.meta.env.VITE_API_URL + '/api/v1/assistant/chat', {
         student_id: studentId,
         message: text,
       });

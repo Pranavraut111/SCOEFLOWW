@@ -83,7 +83,7 @@ const StudentEnrollmentManager = ({ examEvent }: StudentEnrollmentManagerProps) 
   const fetchEnrollments = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/v1/exams/events/${examEvent.id}/enrollments/`);
+      const response = await fetch(import.meta.env.VITE_API_URL + `/api/v1/exams/events/${examEvent.id}/enrollments/`);
       if (response.ok) {
         const data = await response.json();
         setEnrollments(data);
@@ -101,7 +101,7 @@ const StudentEnrollmentManager = ({ examEvent }: StudentEnrollmentManagerProps) 
 
   const fetchEligibleStudents = async () => {
     try {
-      const response = await fetch(`/api/v1/students/?department=${examEvent.department}&semester=${examEvent.semester}`);
+      const response = await fetch(import.meta.env.VITE_API_URL + `/api/v1/students/?department=${examEvent.department}&semester=${examEvent.semester}`);
       if (response.ok) {
         const data = await response.json();
         // Filter out already enrolled students
@@ -116,7 +116,7 @@ const StudentEnrollmentManager = ({ examEvent }: StudentEnrollmentManagerProps) 
 
   const handleBulkEnrollAll = async () => {
     try {
-      const response = await fetch(`/api/v1/exams/events/${examEvent.id}/enrollments/bulk`, {
+      const response = await fetch(import.meta.env.VITE_API_URL + `/api/v1/exams/events/${examEvent.id}/enrollments/bulk`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -161,7 +161,7 @@ const StudentEnrollmentManager = ({ examEvent }: StudentEnrollmentManagerProps) 
     }
 
     try {
-      const response = await fetch(`/api/v1/exams/events/${examEvent.id}/enrollments/bulk`, {
+      const response = await fetch(import.meta.env.VITE_API_URL + `/api/v1/exams/events/${examEvent.id}/enrollments/bulk`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -198,7 +198,7 @@ const StudentEnrollmentManager = ({ examEvent }: StudentEnrollmentManagerProps) 
 
   const handleIndividualEnroll = async (studentId: number) => {
     try {
-      const response = await fetch(`/api/v1/exams/events/${examEvent.id}/enrollments/`, {
+      const response = await fetch(import.meta.env.VITE_API_URL + `/api/v1/exams/events/${examEvent.id}/enrollments/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -230,7 +230,7 @@ const StudentEnrollmentManager = ({ examEvent }: StudentEnrollmentManagerProps) 
 
   const handleUpdateEnrollment = async (enrollmentId: number, updates: any) => {
     try {
-      const response = await fetch(`/api/v1/exams/enrollments/${enrollmentId}`, {
+      const response = await fetch(import.meta.env.VITE_API_URL + `/api/v1/exams/enrollments/${enrollmentId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -260,7 +260,7 @@ const StudentEnrollmentManager = ({ examEvent }: StudentEnrollmentManagerProps) 
     if (!confirm('Are you sure you want to remove this student from the exam?')) return;
 
     try {
-      const response = await fetch(`/api/v1/exams/enrollments/${enrollmentId}`, {
+      const response = await fetch(import.meta.env.VITE_API_URL + `/api/v1/exams/enrollments/${enrollmentId}`, {
         method: 'DELETE',
       });
 
@@ -637,7 +637,7 @@ const ExcelImportForm = ({ examEvent, onSuccess, onCancel }: ExcelImportFormProp
   const validateStudentsInDatabase = async (students: any[]) => {
     try {
       // Get all students from database for validation
-      const response = await fetch('/api/v1/students/');
+      const response = await fetch(import.meta.env.VITE_API_URL + '/api/v1/students/');
       if (!response.ok) {
         throw new Error('Failed to fetch students from database');
       }
@@ -681,7 +681,7 @@ const ExcelImportForm = ({ examEvent, onSuccess, onCancel }: ExcelImportFormProp
   const downloadTemplate = async () => {
     try {
       // Fetch demo students from API
-      const response = await fetch(`/api/v1/students/demo/template-data?department=${encodeURIComponent(examEvent.department)}&limit=5`);
+      const response = await fetch(import.meta.env.VITE_API_URL + `/api/v1/students/demo/template-data?department=${encodeURIComponent(examEvent.department)}&limit=5`);
       
       let demoStudents = [];
       if (response.ok) {
@@ -777,7 +777,7 @@ const ExcelImportForm = ({ examEvent, onSuccess, onCancel }: ExcelImportFormProp
             notes: `Imported via CSV on ${new Date().toLocaleDateString()}`
           };
 
-          const response = await fetch(`/api/v1/exams/events/${examEvent.id}/enrollments/`, {
+          const response = await fetch(import.meta.env.VITE_API_URL + `/api/v1/exams/events/${examEvent.id}/enrollments/`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

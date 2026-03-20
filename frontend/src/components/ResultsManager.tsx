@@ -79,7 +79,7 @@ const ResultsManager = () => {
 
   const fetchStudents = async () => {
     try {
-      const response = await fetch(`/api/v1/students/?department=${encodeURIComponent(department)}&semester=${semester}`);
+      const response = await fetch(import.meta.env.VITE_API_URL + `/api/v1/students/?department=${encodeURIComponent(department)}&semester=${semester}`);
       if (response.ok) {
         const data = await response.json();
         setStudents(data);
@@ -92,7 +92,7 @@ const ResultsManager = () => {
   const fetchSemesterResults = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/v1/results/semester/all?department=${encodeURIComponent(department)}&semester=${semester}&academic_year=${academicYear}`);
+      const response = await fetch(import.meta.env.VITE_API_URL + `/api/v1/results/semester/all?department=${encodeURIComponent(department)}&semester=${semester}&academic_year=${academicYear}`);
       if (response.ok) {
         const data = await response.json();
         setSemesterResults(data);
@@ -195,7 +195,7 @@ const ResultsManager = () => {
       // Add each student_id as a separate query parameter (string IDs)
       studentIds.forEach(id => queryParams.append('student_ids', id));
       
-      const response = await fetch(`/api/v1/results/publish?${queryParams.toString()}`, {
+      const response = await fetch(import.meta.env.VITE_API_URL + `/api/v1/results/publish?${queryParams.toString()}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       });

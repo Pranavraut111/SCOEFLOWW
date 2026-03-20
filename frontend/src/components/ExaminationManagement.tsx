@@ -54,7 +54,7 @@ const ExaminationManagement = () => {
   const fetchExamEvents = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/v1/exams/events/');
+      const response = await fetch(import.meta.env.VITE_API_URL + '/api/v1/exams/events/');
       if (response.ok) {
         const events = await response.json();
         setExamEvents(events);
@@ -97,7 +97,7 @@ const ExaminationManagement = () => {
     }
 
     try {
-      const response = await fetch(`/api/v1/exams/events/${eventId}`, {
+      const response = await fetch(import.meta.env.VITE_API_URL + `/api/v1/exams/events/${eventId}`, {
         method: 'DELETE',
       });
 

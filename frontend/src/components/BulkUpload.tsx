@@ -32,7 +32,7 @@ const BulkUpload = ({ onStudentsUploaded }: BulkUploadProps) => {
 
   const fetchExistingStudents = async () => {
     try {
-      const response = await fetch('/api/v1/students/');
+      const response = await fetch(import.meta.env.VITE_API_URL + '/api/v1/students/');
       if (response.ok) {
         const students = await response.json();
         setExistingStudents(students);
@@ -117,7 +117,7 @@ const BulkUpload = ({ onStudentsUploaded }: BulkUploadProps) => {
       formData.append('file', file);
       
       try {
-        const response = await fetch('/api/v1/students/import/preview', {
+        const response = await fetch(import.meta.env.VITE_API_URL + '/api/v1/students/import/preview', {
           method: 'POST',
           body: formData,
         });
@@ -306,7 +306,7 @@ const BulkUpload = ({ onStudentsUploaded }: BulkUploadProps) => {
     formData.append('file', file);
 
     try {
-      const response = await fetch('/api/v1/students/import/save', {
+      const response = await fetch(import.meta.env.VITE_API_URL + '/api/v1/students/import/save', {
         method: 'POST',
         body: formData,
       });

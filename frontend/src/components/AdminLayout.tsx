@@ -67,7 +67,7 @@ const AdminLayout = ({ children, activeTab, onTabChange }: AdminLayoutProps) => 
     setIsLoading(true);
     
     try {
-      const response = await axios.post('/api/v1/admin/auth/login', {
+      const response = await axios.post(import.meta.env.VITE_API_URL + '/api/v1/admin/auth/login', {
         email: email,
         password: password
       });

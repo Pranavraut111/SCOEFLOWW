@@ -67,7 +67,7 @@ const ExamNotifications = ({ studentId, studentName, rollNumber, department, sem
 
   const fetchNotifications = async () => {
     try {
-      const response = await axios.get(`/api/v1/enrollment-applications/student/${studentId}/notifications`);
+      const response = await axios.get(import.meta.env.VITE_API_URL + `/api/v1/enrollment-applications/student/${studentId}/notifications`);
       setNotifications(response.data);
     } catch (error) {
       console.error('Error fetching notifications:', error);
@@ -80,7 +80,7 @@ const ExamNotifications = ({ studentId, studentName, rollNumber, department, sem
     setLoadingSchedules(true);
     try {
       console.log('Fetching schedules for exam event:', examEventId);
-      const response = await axios.get(`/api/v1/exams/events/${examEventId}/schedules/`);
+      const response = await axios.get(import.meta.env.VITE_API_URL + `/api/v1/exams/events/${examEventId}/schedules/`);
       console.log('Schedules response:', response.data);
       setExamSchedules(response.data);
     } catch (error: any) {
@@ -148,7 +148,7 @@ const ExamNotifications = ({ studentId, studentName, rollNumber, department, sem
 
     setSubmitting(true);
     try {
-      const response = await axios.post(`/api/v1/enrollment-applications/apply?student_id=${studentId}`, applicationData);
+      const response = await axios.post(import.meta.env.VITE_API_URL + `/api/v1/enrollment-applications/apply?student_id=${studentId}`, applicationData);
       console.log('Application response:', response.data);
 
       toast({

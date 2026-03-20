@@ -38,7 +38,7 @@ const StudentList = () => {
 
   const loadStudents = async () => {
     try {
-      const response = await fetch('/api/v1/students/');
+      const response = await fetch(import.meta.env.VITE_API_URL + '/api/v1/students/');
       if (response.ok) {
         const studentData = await response.json();
         setStudents(studentData);
@@ -71,7 +71,7 @@ const StudentList = () => {
 
   const handleUpdateStudent = async (updatedStudent: Student) => {
     try {
-      const response = await fetch(`/api/v1/students/${updatedStudent.id}`, {
+      const response = await fetch(import.meta.env.VITE_API_URL + `/api/v1/students/${updatedStudent.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -120,7 +120,7 @@ const StudentList = () => {
 
   const handleDeleteStudent = async (studentId: string) => {
     try {
-      const response = await fetch(`/api/v1/students/${studentId}`, {
+      const response = await fetch(import.meta.env.VITE_API_URL + `/api/v1/students/${studentId}`, {
         method: 'DELETE',
       });
       

@@ -32,7 +32,7 @@ const ExamDashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      const response = await fetch('/api/v1/exams/dashboard');
+      const response = await fetch(import.meta.env.VITE_API_URL + '/api/v1/exams/dashboard');
       if (response.ok) {
         const data = await response.json();
         setDashboardData(data);

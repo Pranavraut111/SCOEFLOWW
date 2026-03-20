@@ -15,7 +15,7 @@ export const generateRollNumber = async (branch: string, year: string): Promise<
   
   try {
     // Get the next sequential number from backend
-    const response = await fetch(`/api/v1/students/next-roll-number?department=${encodeURIComponent(branch)}&start_range=${startRange}`);
+    const response = await fetch(import.meta.env.VITE_API_URL + `/api/v1/students/next-roll-number?department=${encodeURIComponent(branch)}&start_range=${startRange}`);
     if (response.ok) {
       const data = await response.json();
       return `SCOE${data.roll_number}`;
