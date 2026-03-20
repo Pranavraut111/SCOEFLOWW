@@ -41,20 +41,38 @@ const LandingPage = () => {
   useEffect(() => {
     const images: HTMLImageElement[] = [];
     let loaded = 0;
+    
+    // Safety timeout: force Complete after 6 seconds even if not all frames loaded
+    const fallbackTimer = setTimeout(() => {
+      if (!allLoaded) {
+        setAllLoaded(true);
+        setTimeout(() => setLoadingDone(true), 800);
+      }
+    }, 6000);
+
+    const checkComplete = () => {
+      loaded++;
+      // We only update state every 10 frames or at the end to prevent excessive re-renders
+      if (loaded % 10 === 0 || loaded === TOTAL_FRAMES) {
+        setLoadedCount(loaded);
+      }
+      
+      if (loaded === TOTAL_FRAMES) {
+        clearTimeout(fallbackTimer);
+        setAllLoaded(true);
+        setTimeout(() => setLoadingDone(true), 800);
+      }
+    };
+
     for (let i = 0; i < TOTAL_FRAMES; i++) {
       const img = new Image();
       img.src = `/frames/landing/ezgif-frame-${padNum(i + 1)}.jpg`;
-      img.onload = img.onerror = () => {
-        loaded++;
-        setLoadedCount(loaded);
-        if (loaded === TOTAL_FRAMES) {
-          setAllLoaded(true);
-          setTimeout(() => setLoadingDone(true), 800);
-        }
-      };
+      img.onload = img.onerror = checkComplete;
       images[i] = img;
     }
     framesRef.current = images;
+    
+    return () => clearTimeout(fallbackTimer);
   }, []);
 
   /* ── DRAW FRAME ── */
