@@ -6,6 +6,16 @@
 
 ![Tech Stack](https://img.shields.io/badge/React-18-blue?logo=react) ![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green?logo=fastapi) ![Firebase](https://img.shields.io/badge/Firebase-Firestore-orange?logo=firebase) ![Gemini](https://img.shields.io/badge/Gemini-2.5_Flash-purple?logo=google) ![Hindsight](https://img.shields.io/badge/Hindsight-AI_Memory-red)
 
+> [!TIP]
+> ### 🔐 Demo Credentials
+> **Admin Login:**
+> - Email: `Praut1086@gmail.com`
+> - Password: `admin123`
+> 
+> **Student Login:**
+> - Email: `lasya.korandla@cse.scoe.edu.in`
+> - Password: `Student@123`
+
 ---
 
 ## ✨ Key Features
