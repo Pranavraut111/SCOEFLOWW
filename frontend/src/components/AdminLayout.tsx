@@ -20,8 +20,7 @@ import {
   EyeOff,
   Shield,
   Users2,
-  CalendarDays,
-  MapPin
+  CalendarDays
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -53,7 +52,6 @@ const AdminLayout = ({ children, activeTab, onTabChange }: AdminLayoutProps) => 
     { id: 'examinations', label: 'Examinations', icon: ClipboardList },
     { id: 'clubs', label: 'Club Management', icon: Users2 },
     { id: 'events', label: 'Event Management', icon: CalendarDays },
-    { id: 'locations', label: 'Campus Locations', icon: MapPin },
   ];
 
   const handleLogin = async () => {

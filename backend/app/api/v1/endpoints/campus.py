@@ -113,3 +113,54 @@ def delete_location_by_id(loc_id: str):
     if not success:
         raise HTTPException(status_code=404, detail="Location not found")
     return {"message": "Location deleted successfully"}
+
+
+# ===== STUDENT CLUB/EVENT ACTIONS =====
+
+from app.crud.firebase_crud import (
+    join_club as crud_join_club,
+    get_student_clubs as crud_get_student_clubs,
+    leave_club as crud_leave_club,
+    attend_event as crud_attend_event,
+    get_student_attended_events as crud_get_student_events,
+)
+
+
+@router.post("/clubs/{club_id}/join")
+def student_join_club(club_id: str, data: dict):
+    student_id = data.get("student_id")
+    if not student_id:
+        raise HTTPException(status_code=400, detail="student_id is required")
+    result = crud_join_club(student_id, club_id)
+    return result
+
+
+@router.post("/clubs/{club_id}/leave")
+def student_leave_club(club_id: str, data: dict):
+    student_id = data.get("student_id")
+    if not student_id:
+        raise HTTPException(status_code=400, detail="student_id is required")
+    success = crud_leave_club(student_id, club_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Membership not found")
+    return {"message": "Left club successfully"}
+
+
+@router.get("/student/{student_id}/clubs")
+def get_clubs_for_student(student_id: str):
+    return crud_get_student_clubs(student_id)
+
+
+@router.post("/events/{event_id}/attend")
+def student_attend_event(event_id: str, data: dict):
+    student_id = data.get("student_id")
+    if not student_id:
+        raise HTTPException(status_code=400, detail="student_id is required")
+    result = crud_attend_event(student_id, event_id)
+    return result
+
+
+@router.get("/student/{student_id}/events")
+def get_events_for_student(student_id: str):
+    return crud_get_student_events(student_id)
+

@@ -12,7 +12,7 @@ import {
   Home, Lock, Eye, EyeOff, LogOut, Key, Download, Bell, Award,
   ChevronLeft, ChevronRight, CheckCircle,
   Send, Bot, Loader2, Building2, MessageSquare, Navigation, UserCircle, Lightbulb,
-  Star, Landmark, Users, Trophy
+  Star, Landmark, Users, Trophy, Users2, CalendarDays, UserPlus, Clock
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
@@ -109,6 +109,8 @@ const ONBOARDING_STEPS = [
 // ========== SIDEBAR NAV ITEMS ==========
 const NAV_ITEMS = [
   { id: 'college', label: 'Know Your College', icon: Building2 },
+  { id: 'clubs', label: 'Join Clubs', icon: Users2 },
+  { id: 'events', label: 'Events', icon: CalendarDays },
   { id: 'chat', label: 'AI Chat', icon: MessageSquare },
   { id: 'recommendations', label: 'AI Recommendations', icon: Lightbulb },
   { id: 'navigation', label: 'Campus Navigation', icon: Navigation },
@@ -178,6 +180,14 @@ const StudentPortal = () => {
   // Results
   const [publishedResults, setPublishedResults] = useState<any[]>([]);
 
+  // Clubs & Events
+  const [allClubs, setAllClubs] = useState<any[]>([]);
+  const [joinedClubIds, setJoinedClubIds] = useState<string[]>([]);
+  const [allEvents, setAllEvents] = useState<any[]>([]);
+  const [registeredEventIds, setRegisteredEventIds] = useState<string[]>([]);
+  const [loadingClubs, setLoadingClubs] = useState(false);
+  const [loadingEvents, setLoadingEvents] = useState(false);
+
   // Recommendations
   const [recommendations, setRecommendations] = useState<any>(null);
   const [loadingRecs, setLoadingRecs] = useState(false);
@@ -224,7 +234,81 @@ const StudentPortal = () => {
 
   useEffect(() => {
     if (activeSection === 'recommendations') fetchRecommendations();
+    if (activeSection === 'clubs') fetchClubs();
+    if (activeSection === 'events') fetchEvents();
   }, [activeSection]);
+
+  const fetchClubs = async () => {
+    if (!student) return;
+    setLoadingClubs(true);
+    try {
+      const [clubsRes, joinedRes] = await Promise.all([
+        axios.get('/api/v1/campus/clubs'),
+        axios.get(`/api/v1/campus/student/${student.id}/clubs`)
+      ]);
+      setAllClubs(clubsRes.data || []);
+      setJoinedClubIds((joinedRes.data || []).map((c: any) => c.id));
+    } catch {}
+    finally { setLoadingClubs(false); }
+  };
+
+  const fetchEvents = async () => {
+    if (!student) return;
+    setLoadingEvents(true);
+    try {
+      const [eventsRes, regRes] = await Promise.all([
+        axios.get('/api/v1/campus/events'),
+        axios.get(`/api/v1/campus/student/${student.id}/events`)
+      ]);
+      setAllEvents(eventsRes.data || []);
+      setRegisteredEventIds((regRes.data || []).map((e: any) => e.id));
+    } catch {}
+    finally { setLoadingEvents(false); }
+  };
+
+  const handleJoinClub = async (clubId: string) => {
+    if (!student) return;
+    try {
+      const res = await axios.post(`/api/v1/campus/clubs/${clubId}/join`, { student_id: student.id });
+      if (res.data.already_joined) {
+        toast({ title: 'Already Joined', description: 'You are already a member of this club.' });
+      } else {
+        toast({ title: 'Joined!', description: 'You have successfully joined this club.' });
+      }
+      setJoinedClubIds(prev => [...new Set([...prev, clubId])]);
+      fetchClubs();
+    } catch {
+      toast({ title: 'Error', description: 'Failed to join club.', variant: 'destructive' });
+    }
+  };
+
+  const handleLeaveClub = async (clubId: string) => {
+    if (!student) return;
+    try {
+      await axios.post(`/api/v1/campus/clubs/${clubId}/leave`, { student_id: student.id });
+      toast({ title: 'Left Club', description: 'You have left this club.' });
+      setJoinedClubIds(prev => prev.filter(id => id !== clubId));
+      fetchClubs();
+    } catch {
+      toast({ title: 'Error', description: 'Failed to leave club.', variant: 'destructive' });
+    }
+  };
+
+  const handleAttendEvent = async (eventId: string) => {
+    if (!student) return;
+    try {
+      const res = await axios.post(`/api/v1/campus/events/${eventId}/attend`, { student_id: student.id });
+      if (res.data.already_attended) {
+        toast({ title: 'Already Registered', description: 'You are already registered for this event.' });
+      } else {
+        toast({ title: 'Registered!', description: 'You have successfully registered for this event.' });
+      }
+      setRegisteredEventIds(prev => [...new Set([...prev, eventId])]);
+      fetchEvents();
+    } catch {
+      toast({ title: 'Error', description: 'Failed to register for event.', variant: 'destructive' });
+    }
+  };
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -674,6 +758,150 @@ const StudentPortal = () => {
                   </div>
                 </CardContent>
               </Card>
+            </div>
+          )}
+
+          {/* ===== JOIN CLUBS ===== */}
+          {activeSection === 'clubs' && (
+            <div className="space-y-6 animate-in fade-in duration-500">
+              <div>
+                <h3 className="text-xl font-bold flex items-center gap-2 mb-1"><Users2 className="h-5 w-5 text-blue-600" />Join Clubs</h3>
+                <p className="text-sm text-muted-foreground">Explore and join clubs created by the administration.</p>
+              </div>
+
+              {loadingClubs && (
+                <div className="flex flex-col items-center justify-center py-20">
+                  <Loader2 className="h-10 w-10 animate-spin text-blue-500 mb-4" />
+                  <p className="text-muted-foreground">Loading clubs...</p>
+                </div>
+              )}
+
+              {!loadingClubs && allClubs.length === 0 && (
+                <Card className="bg-white text-center py-12">
+                  <CardContent>
+                    <Users2 className="h-12 w-12 mx-auto mb-3 text-muted-foreground/30" />
+                    <p className="text-muted-foreground">No clubs available yet. Check back later!</p>
+                  </CardContent>
+                </Card>
+              )}
+
+              {!loadingClubs && allClubs.length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                  {allClubs.map(club => {
+                    const isJoined = joinedClubIds.includes(club.id);
+                    return (
+                      <Card key={club.id} className="bg-white overflow-hidden hover:shadow-lg transition-all duration-300 group">
+                        {club.image_url && (
+                          <div className="h-40 overflow-hidden">
+                            <img src={club.image_url} alt={club.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                          </div>
+                        )}
+                        <CardHeader className="pb-2">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <CardTitle className="text-lg">{club.name}</CardTitle>
+                              <Badge variant="secondary" className="mt-1 text-xs">{club.category}</Badge>
+                            </div>
+                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                              <Users className="h-3.5 w-3.5" />
+                              {club.member_count || 0}
+                            </div>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-sm text-muted-foreground mb-4 line-clamp-3">{club.description}</p>
+                          {isJoined ? (
+                            <div className="flex gap-2">
+                              <Badge className="bg-green-100 text-green-700 flex items-center gap-1">
+                                <CheckCircle className="h-3 w-3" /> Joined
+                              </Badge>
+                              <Button variant="outline" size="sm" className="ml-auto text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => handleLeaveClub(club.id)}>
+                                Leave
+                              </Button>
+                            </div>
+                          ) : (
+                            <Button className="w-full bg-blue-600 hover:bg-blue-500 text-white" onClick={() => handleJoinClub(club.id)}>
+                              <UserPlus className="h-4 w-4 mr-2" /> Join Club
+                            </Button>
+                          )}
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ===== EVENTS ===== */}
+          {activeSection === 'events' && (
+            <div className="space-y-6 animate-in fade-in duration-500">
+              <div>
+                <h3 className="text-xl font-bold flex items-center gap-2 mb-1"><CalendarDays className="h-5 w-5 text-purple-600" />Events</h3>
+                <p className="text-sm text-muted-foreground">Explore upcoming events and register to attend.</p>
+              </div>
+
+              {loadingEvents && (
+                <div className="flex flex-col items-center justify-center py-20">
+                  <Loader2 className="h-10 w-10 animate-spin text-purple-500 mb-4" />
+                  <p className="text-muted-foreground">Loading events...</p>
+                </div>
+              )}
+
+              {!loadingEvents && allEvents.length === 0 && (
+                <Card className="bg-white text-center py-12">
+                  <CardContent>
+                    <CalendarDays className="h-12 w-12 mx-auto mb-3 text-muted-foreground/30" />
+                    <p className="text-muted-foreground">No events scheduled yet. Check back later!</p>
+                  </CardContent>
+                </Card>
+              )}
+
+              {!loadingEvents && allEvents.length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  {allEvents.map(event => {
+                    const isRegistered = registeredEventIds.includes(event.id);
+                    return (
+                      <Card key={event.id} className="bg-white overflow-hidden hover:shadow-lg transition-all duration-300 group">
+                        {event.image_url && (
+                          <div className="h-44 overflow-hidden">
+                            <img src={event.image_url} alt={event.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                          </div>
+                        )}
+                        <CardHeader className="pb-2">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <CardTitle className="text-lg">{event.title}</CardTitle>
+                              <div className="flex items-center gap-2 mt-1">
+                                <Badge variant="secondary" className="text-xs">{event.category}</Badge>
+                                {event.club_name && <Badge className="bg-blue-100 text-blue-700 text-xs">{event.club_name}</Badge>}
+                              </div>
+                            </div>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{event.description}</p>
+                          <div className="flex flex-wrap gap-3 text-xs text-muted-foreground mb-4">
+                            <span className="flex items-center gap-1"><Calendar className="h-3.5 w-3.5" />{event.date}</span>
+                            {event.time && <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" />{event.time}</span>}
+                            <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{event.location}</span>
+                            <span className="flex items-center gap-1"><Users className="h-3.5 w-3.5" />{event.attendee_count || 0} attending</span>
+                          </div>
+                          {isRegistered ? (
+                            <Badge className="bg-green-100 text-green-700 flex items-center gap-1 w-fit">
+                              <CheckCircle className="h-3 w-3" /> Registered
+                            </Badge>
+                          ) : (
+                            <Button className="w-full bg-purple-600 hover:bg-purple-500 text-white" onClick={() => handleAttendEvent(event.id)}>
+                              <CalendarDays className="h-4 w-4 mr-2" /> Register for Event
+                            </Button>
+                          )}
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
 

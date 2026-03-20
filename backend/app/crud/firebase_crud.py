@@ -3,12 +3,21 @@ Firebase Firestore CRUD operations for all collections.
 Replaces the old SQLAlchemy-based CRUD.
 """
 from app.core.firebase import get_firestore_db
-from passlib.context import CryptContext
+import bcrypt
 from datetime import datetime
 from typing import Optional, List
 import uuid
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def _hash_password(password: str) -> str:
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+
+
+def _verify_password(password: str, hashed: str) -> bool:
+    try:
+        return bcrypt.checkpw(password.encode("utf-8"), hashed.encode("utf-8"))
+    except Exception:
+        return False
 
 
 def _generate_id():
@@ -25,7 +34,7 @@ def create_student(data: dict) -> dict:
     
     # Hash password
     password = data.pop("password", "Student@123")
-    data["password_hash"] = pwd_context.hash(password)
+    data["password_hash"] = _hash_password(password)
     data["created_at"] = datetime.utcnow().isoformat()
     
     db.collection("students").document(student_id).set(data)
@@ -96,7 +105,7 @@ def verify_student_password(email: str, password: str) -> Optional[dict]:
             return student
         return None
     
-    if pwd_context.verify(password, password_hash):
+    if _verify_password(password, password_hash):
         return student
     return None
 
@@ -107,12 +116,12 @@ def change_student_password(student_id: str, old_password: str, new_password: st
         return False
     
     password_hash = student.get("password_hash", "")
-    if password_hash and not pwd_context.verify(old_password, password_hash):
+    if password_hash and not _verify_password(old_password, password_hash):
         return False
     
     db = get_firestore_db()
     db.collection("students").document(student_id).update({
-        "password_hash": pwd_context.hash(new_password)
+        "password_hash": _hash_password(new_password)
     })
     return True
 

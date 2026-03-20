@@ -7,7 +7,6 @@ import BulkUpload from '@/components/BulkUpload';
 import ExaminationManagement from '@/components/ExaminationManagement';
 import ClubManagement from '@/components/ClubManagement';
 import EventManagement from '@/components/EventManagement';
-import CampusLocationManager from '@/components/CampusLocationManager';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('students');
@@ -35,8 +34,6 @@ const AdminDashboard = () => {
         return <ClubManagement />;
       case 'events':
         return <EventManagement />;
-      case 'locations':
-        return <CampusLocationManager />;
       case 'students':
       default:
         return <StudentList key={refreshTrigger} />;

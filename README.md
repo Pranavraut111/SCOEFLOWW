@@ -2,7 +2,7 @@
 
 > **Saraswati College of Engineering (SCOE), Kharghar, Navi Mumbai**
 >
-> An AI-powered student management system with campus navigation, personalized AI assistant, and immersive club experiences.
+> An AI-powered student management system with club & event management, personalized AI assistant, and immersive club experiences.
 
 ![Tech Stack](https://img.shields.io/badge/React-18-blue?logo=react) ![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green?logo=fastapi) ![Firebase](https://img.shields.io/badge/Firebase-Firestore-orange?logo=firebase) ![Gemini](https://img.shields.io/badge/Gemini-2.5_Flash-purple?logo=google) ![Hindsight](https://img.shields.io/badge/Hindsight-AI_Memory-red)
 
@@ -35,6 +35,18 @@
 - Ground Floor → Fifth Floor interactive exploration
 - Department locations, lab placements, facilities
 
+### 🎭 Join Clubs (Student Portal)
+- Browse all admin-created clubs with descriptions and categories
+- One-click **Join / Leave** functionality
+- Live member count tracking
+- Admin receives student join details in Firebase
+
+### 📅 Events (Student Portal)
+- View upcoming events created by admin (Workshops, Seminars, Hackathons, Cultural)
+- **Register** for events with one click
+- Shows date, time, location, and attendee count
+- Events linked to organizing clubs
+
 ### 📚 Know Your College
 - Auto-sliding photo gallery of SCOE campus
 - Department information (CE, CS AI&ML, DS, ME, CivE, IT, AE)
@@ -47,12 +59,18 @@
 - Subject master with component marks (IA, Viva, ESE)
 - Mumbai University grading system (SGPA/CGPA)
 - Examination event management
+- **Club Management** — Create, edit, delete clubs
+- **Event Management** — Create, edit, delete events with club linking
 - Component-wise passing enforcement
 - Result calculation, publishing, and download
 - Detailed result sheets
 
 ### 👨‍🎓 Student Portal
 - 9-step onboarding personality quiz
+- **Join Clubs** — Browse and join admin-created clubs
+- **Events** — View and register for upcoming events
+- AI Chat with Gemini 2.5 Flash
+- AI-powered personalized recommendations
 - Profile with academic data
 - Exam notifications & enrollment
 - Result download (CSV)
@@ -170,6 +188,21 @@ PROJECTSCOE2/
 | POST | `/api/v1/results/publish` | Publish results |
 | POST | `/api/v1/exams/events` | Create exam event |
 
+### Clubs & Events
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/campus/clubs` | List all clubs |
+| POST | `/api/v1/campus/clubs` | Create club (admin) |
+| PUT | `/api/v1/campus/clubs/{id}` | Update club (admin) |
+| DELETE | `/api/v1/campus/clubs/{id}` | Delete club (admin) |
+| POST | `/api/v1/campus/clubs/{id}/join` | Student joins club |
+| POST | `/api/v1/campus/clubs/{id}/leave` | Student leaves club |
+| GET | `/api/v1/campus/student/{id}/clubs` | Student's joined clubs |
+| GET | `/api/v1/campus/events` | List all events |
+| POST | `/api/v1/campus/events` | Create event (admin) |
+| POST | `/api/v1/campus/events/{id}/attend` | Student registers for event |
+| GET | `/api/v1/campus/student/{id}/events` | Student's registered events |
+
 ---
 
 ## 🎓 Mumbai University Compliance
@@ -217,4 +250,4 @@ ADMIN_PASSWORD=admin123
 
 ---
 
-**Version:** 3.0 | **Last Updated:** March 2026 | **Status:** Production Ready ✅
+**Version:** 3.1 | **Last Updated:** March 2026 | **Status:** Production Ready ✅
