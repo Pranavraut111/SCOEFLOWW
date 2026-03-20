@@ -1,5 +1,2 @@
 # Package marker for app.schemas
-from .student import *
-from .subject import *
-
-
+# Campus schemas are imported directly where needed

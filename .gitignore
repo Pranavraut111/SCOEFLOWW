@@ -69,3 +69,11 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+
+# Firebase key
+firebase_key.json
+backend/firebase_key.json
+
+# Python cache
+**/__pycache__/
+*.pyc

@@ -110,62 +110,39 @@ const ResultsManager = () => {
   const handleCalculateAllSubjectResults = async () => {
     setIsCalculating(true);
     try {
-      // First, get all unique subject IDs from component marks
-      const marksResponse = await fetch(`/api/v1/results/marks/component/all?department=${encodeURIComponent(department)}&semester=${semester}`);
+      // Smart endpoint: only calculates for students who have marks
+      const response = await fetch(
+        `/api/v1/results/calculate-all?department=${encodeURIComponent(department)}&semester=${semester}&academic_year=${academicYear}`,
+        { method: 'POST' }
+      );
       
-      if (!marksResponse.ok) {
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.detail || 'Calculation failed');
+      }
+
+      const result = await response.json();
+      
+      if (result.students_processed === 0) {
         toast({
-          title: "Error",
-          description: "No component marks found. Please enter marks first.",
+          title: "No Marks Found",
+          description: "No component marks found for this semester. Please enter marks first in the Marks Entry tab.",
           variant: "destructive"
         });
-        setIsCalculating(false);
-        return;
+      } else {
+        toast({
+          title: "✅ Results Calculated!",
+          description: `Processed ${result.students_processed} students: ${result.subject_results_calculated} subject results, ${result.semester_results_calculated} semester results (SGPA/CGPA)`,
+        });
       }
 
-      const allMarks = await marksResponse.json();
-      
-      // Get unique student-subject combinations
-      const combinations = new Set<string>();
-      allMarks.forEach((mark: any) => {
-        combinations.add(`${mark.student_id}-${mark.subject_id}`);
-      });
-
-      let successCount = 0;
-      let errorCount = 0;
-
-      // Calculate result for each unique student-subject combination
-      for (const combo of Array.from(combinations)) {
-        const [studentId, subjectId] = combo.split('-').map(Number);
-        
-        try {
-          const response = await fetch(
-            `/api/v1/results/subject/calculate?student_id=${studentId}&subject_id=${subjectId}&academic_year=${academicYear}&semester=${semester}`,
-            { method: 'POST' }
-          );
-          
-          if (response.ok) {
-            successCount++;
-          } else {
-            const error = await response.json();
-            console.error('Failed to calculate:', error);
-            errorCount++;
-          }
-        } catch (error) {
-          console.error('Error calculating:', error);
-          errorCount++;
-        }
-      }
-
-      toast({
-        title: "✅ Subject Results Calculated",
-        description: `Successfully calculated ${successCount} subject results. ${errorCount > 0 ? `${errorCount} failed.` : ''}`,
-      });
-    } catch (error) {
+      // Refresh results table
+      await fetchSemesterResults();
+    } catch (error: any) {
       console.error('Calculation error:', error);
       toast({
         title: "Error",
-        description: "Failed to calculate subject results",
+        description: error.message || "Failed to calculate results",
         variant: "destructive"
       });
     } finally {
@@ -174,44 +151,8 @@ const ResultsManager = () => {
   };
 
   const handleCalculateAllSGPA = async () => {
-    setIsCalculating(true);
-    try {
-      let successCount = 0;
-      let errorCount = 0;
-
-      for (const student of students) {
-        try {
-          const response = await fetch(
-            `/api/v1/results/semester/calculate?student_id=${student.id}&semester=${semester}&academic_year=${academicYear}`,
-            { method: 'POST' }
-          );
-          
-          if (response.ok) {
-            successCount++;
-          } else {
-            errorCount++;
-          }
-        } catch (error) {
-          errorCount++;
-        }
-      }
-
-      toast({
-        title: "✅ SGPA/CGPA Calculated",
-        description: `Successfully calculated for ${successCount} students. ${errorCount > 0 ? `${errorCount} failed.` : ''}`,
-      });
-
-      // Refresh results
-      await fetchSemesterResults();
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to calculate SGPA/CGPA",
-        variant: "destructive"
-      });
-    } finally {
-      setIsCalculating(false);
-    }
+    // Same smart endpoint handles both subject results AND SGPA in one go
+    await handleCalculateAllSubjectResults();
   };
 
   const getStatusBadge = (status: string) => {
@@ -242,7 +183,7 @@ const ResultsManager = () => {
     try {
       setIsLoading(true);
       
-      const studentIds = semesterResults.map(r => r.student_id);
+      const studentIds = semesterResults.map(r => String(r.student_id));
       
       // Publish results for all students in this semester
       const queryParams = new URLSearchParams({
@@ -251,8 +192,8 @@ const ResultsManager = () => {
         academic_year: academicYear
       });
       
-      // Add each student_id as a separate query parameter
-      studentIds.forEach(id => queryParams.append('student_ids', id.toString()));
+      // Add each student_id as a separate query parameter (string IDs)
+      studentIds.forEach(id => queryParams.append('student_ids', id));
       
       const response = await fetch(`/api/v1/results/publish?${queryParams.toString()}`, {
         method: 'POST',

@@ -150,22 +150,25 @@ const ExamScheduleManager = ({ examEvent, onNavigateToEnrollment }: ExamSchedule
 
       const romanSemester = semesterToRoman(examEvent.semester);
       
-      // Use exam event's academic year
-      const response = await fetch(`/api/v1/subjects/?year=${(examEvent as any).academic_year}&department=${encodeURIComponent(examEvent.department)}&semester=${romanSemester}`);
+      // Fetch subjects by department and semester (don't filter by year — year format may differ)
+      const response = await fetch(`/api/v1/subjects/?department=${encodeURIComponent(examEvent.department)}&semester=${romanSemester}`);
       if (response.ok) {
         const data = await response.json();
+        console.log('Subjects received:', data);
         setSubjects(data);
-      } else {
-        // Fallback to get all subjects and filter
-        const fallbackResponse = await fetch('/api/v1/subjects/');
-        if (fallbackResponse.ok) {
-          const fallbackData = await fallbackResponse.json();
-          // Filter subjects by department and semester on frontend
-          const filteredSubjects = fallbackData.filter((subject: any) => 
-            subject.department === examEvent.department && 
-            subject.semester === romanSemester
-          );
-          setSubjects(filteredSubjects);
+        
+        if (data.length === 0) {
+          // Fallback: try fetching all and filtering on frontend  
+          const fallbackResponse = await fetch('/api/v1/subjects/');
+          if (fallbackResponse.ok) {
+            const fallbackData = await fallbackResponse.json();
+            const filteredSubjects = fallbackData.filter((subject: any) => 
+              subject.department === examEvent.department && 
+              subject.semester === romanSemester
+            );
+            console.log('Fallback filtered subjects:', filteredSubjects);
+            setSubjects(filteredSubjects);
+          }
         }
       }
     } catch (error) {

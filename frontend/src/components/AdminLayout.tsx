@@ -18,7 +18,10 @@ import {
   Lock,
   Eye,
   EyeOff,
-  Shield
+  Shield,
+  Users2,
+  CalendarDays,
+  MapPin
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -48,6 +51,9 @@ const AdminLayout = ({ children, activeTab, onTabChange }: AdminLayoutProps) => 
     { id: 'add-student', label: 'Student Entry', icon: UserPlus },
     { id: 'subjects', label: 'Subject Master', icon: BookOpen },
     { id: 'examinations', label: 'Examinations', icon: ClipboardList },
+    { id: 'clubs', label: 'Club Management', icon: Users2 },
+    { id: 'events', label: 'Event Management', icon: CalendarDays },
+    { id: 'locations', label: 'Campus Locations', icon: MapPin },
   ];
 
   const handleLogin = async () => {
@@ -68,9 +74,9 @@ const AdminLayout = ({ children, activeTab, onTabChange }: AdminLayoutProps) => 
         password: password
       });
 
-      if (response.data.email) {
+      if (response.data.admin || response.data.email) {
         setIsAuthenticated(true);
-        setAdminEmail(response.data.email);
+        setAdminEmail(response.data.admin?.email || response.data.email);
         toast({
           title: "Login successful!",
           description: "Welcome to Admin Portal",
