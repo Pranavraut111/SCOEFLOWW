@@ -1,8 +1,8 @@
 """
 Firebase Admin SDK initialization.
-Supports both service-account key file AND project-ID-only mode.
+Supports: service-account key file, JSON env var, or project-ID-only mode.
 """
-import os, logging
+import os, json, logging, tempfile
 import firebase_admin
 from firebase_admin import credentials, firestore
 from app.core.config import settings
@@ -23,18 +23,29 @@ def _init_firebase():
     key_path = settings.FIREBASE_KEY_PATH
     project_id = getattr(settings, "FIREBASE_PROJECT_ID", None)
 
-    # Option 1: full service-account key file
+    # Option 1: full service-account key file on disk
     if key_path and os.path.isfile(key_path):
         try:
             cred = credentials.Certificate(key_path)
             firebase_admin.initialize_app(cred)
-            logger.info("Firebase initialized with service-account key")
+            logger.info("Firebase initialized with service-account key file")
             return
         except ValueError:
-            # Already initialized by another thread
             return
 
-    # Option 2: project ID only
+    # Option 2: JSON string in environment variable (for Vercel/cloud deployment)
+    firebase_json = os.environ.get("FIREBASE_KEY_JSON", "")
+    if firebase_json:
+        try:
+            key_dict = json.loads(firebase_json)
+            cred = credentials.Certificate(key_dict)
+            firebase_admin.initialize_app(cred)
+            logger.info("Firebase initialized from FIREBASE_KEY_JSON env var")
+            return
+        except (json.JSONDecodeError, ValueError) as e:
+            logger.error(f"Failed to parse FIREBASE_KEY_JSON: {e}")
+
+    # Option 3: project ID only (ADC or emulator)
     if project_id:
         try:
             cred = credentials.ApplicationDefault()
@@ -52,11 +63,11 @@ def _init_firebase():
             return
 
     raise FileNotFoundError(
-        f"Firebase key file not found at {key_path} and no FIREBASE_PROJECT_ID set.\n"
+        f"Firebase key file not found at {key_path} and no FIREBASE_KEY_JSON or FIREBASE_PROJECT_ID set.\n"
         "Please either:\n"
-        "  1. Download your service-account key from Firebase Console\n"
-        "  OR\n"
-        "  2. Set FIREBASE_PROJECT_ID in your .env file"
+        "  1. Place your service-account key file at the path\n"
+        "  2. Set FIREBASE_KEY_JSON env var with the full JSON string\n"
+        "  3. Set FIREBASE_PROJECT_ID in your .env file"
     )
 
 
