@@ -294,7 +294,9 @@ Respond helpfully:"""
         return ChatResponse(response=ai_response, source="gemini")
 
     except Exception as e:
-        logger.error(f"Chat error: {e}")
+        logger.error(f"Chat error details: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
         error_msg = str(e)
         if "429" in error_msg or "quota" in error_msg.lower():
             return ChatResponse(
@@ -302,7 +304,7 @@ Respond helpfully:"""
                 source="error"
             )
         return ChatResponse(
-            response=f"I am having trouble right now. Please try again shortly.",
+            response=f"I am having trouble right now. Please try again shortly. (Error: {str(e)})",
             source="error"
         )
 
