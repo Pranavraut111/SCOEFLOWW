@@ -18,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import ExamNotifications from './ExamNotifications';
 import ClubFrameAnimation from './ClubFrameAnimation';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // ========== ONBOARDING ==========
 const ONBOARDING_STEPS = [
@@ -118,13 +119,92 @@ const NAV_ITEMS = [
 ];
 
 // ========== FLOOR DATA ==========
-const FLOORS = [
-  { id: 'ground', name: 'Ground Floor', image: '/college/floor_ground.jpeg', desc: 'Main Entrance, Reception, Administrative Office, Accounts, Principal Office, Canteen, Parking, Security, Examination Cell' },
-  { id: 'first', name: 'First Floor', image: '/college/floor_first.jpeg', desc: 'Mechanical Engineering Dept, Automobile Engineering Dept, ME/AE Labs (Workshop, Thermodynamics, Fluid Mechanics), Drawing Hall, Seminar Hall 1' },
-  { id: 'second', name: 'Second Floor', image: '/college/floor_second.jpeg', desc: 'Computer Engineering Dept (HOD Office, Faculty), CE Computer Labs (Lab 1, 2, 3), Information Technology Dept, IT Labs, Dept Library' },
-  { id: 'third', name: 'Third Floor', image: '/college/floor_third.jpeg', desc: 'CSE (AI & ML) Dept, Data Science Dept, AI/ML Labs, Research Lab, Project Lab, Seminar Hall 2, Smart Classroom' },
-  { id: 'fourth', name: 'Fourth Floor', image: '/college/floor_fourth.jpeg', desc: 'Civil Engineering Dept, Civil Labs (Surveying, Material Testing, Concrete), Environmental Engg Lab, Conference Room' },
-  { id: 'fifth', name: 'Fifth Floor', image: '/college/floor_fifth.jpeg', desc: 'Main Library (with digital section), Reading Room, Faculty Development Center, Server Room, Terrace Garden / Open Study Area' },
+interface FloorData {
+  id: string;
+  name: string;
+  image: string;
+  desc: string;
+  departments: { category: string; rooms: string[] }[];
+}
+
+const FLOORS: FloorData[] = [
+  { 
+    id: 'ground', 
+    name: 'Ground Floor', 
+    image: '/college/floor_ground.jpeg', 
+    desc: 'Main Entrance, Reception, Administrative Office, Accounts, Principal Office...', 
+    departments: [
+      { category: 'Facilities', rooms: ['Main Entrance', 'Reception', 'Administrative Office', 'Accounts', 'Principal Office', 'Canteen', 'Parking', 'Security', 'Examination Cell'] }
+    ]
+  },
+  { 
+    id: 'first', 
+    name: 'First Floor', 
+    image: '/college/floor_first.jpeg', 
+    desc: 'Mechanical & Civil Departments', 
+    departments: [
+      { category: 'Mechanical Department', rooms: ['MECH CR 1', 'MECH CR 2', 'MECH CR 3', 'MECH CR 4', 'MECH CR 5', 'MECH CR 6', 'MECH CR 7'] },
+      { category: 'Mechanical Labs', rooms: ['MECH LAB 2', 'MECH LAB 3', 'MECH LAB 4', 'MECH LAB 5', 'MECH LAB 6', 'MECH LAB 7'] },
+      { category: 'Other', rooms: ['Meeting Room', 'Computer Centre'] },
+      { category: 'Civil Department', rooms: ['Civil CR 1', 'Civil CR 2', 'Civil CR 3', 'Civil CR 4', 'Civil CR 5', 'Civil CR 6', 'Civil TR 1', 'Civil TR 2'] },
+      { category: 'Facilities', rooms: ['HOD Office', 'Lobby', 'Lift', 'Boys Toilet', 'Girls Toilet', 'Common Room Girls'] }
+    ] 
+  },
+  { 
+    id: 'second', 
+    name: 'Second Floor', 
+    image: '/college/floor_second.jpeg', 
+    desc: 'First Year Classrooms, Labs, Mechanical & Civil TR', 
+    departments: [
+      { category: 'First Year Classrooms', rooms: ['FE CR 1', 'FE CR 2', 'FE CR 3', 'FE CR 4', 'FE CR 5', 'FE CR 6', 'FE CR 7', 'FE CR 8'] },
+      { category: 'Labs', rooms: ['FE Lab 1', 'FE Lab 2', 'FE Lab 3', 'FE Lab 5'] },
+      { category: 'Other Rooms', rooms: ['Language Lab', 'Seminar Hall', 'Dark Room', 'Drawing Hall', 'BEE Lab', 'Lab'] },
+      { category: 'Mechanical', rooms: ['MECH TR 1', 'MECH TR 2'] },
+      { category: 'Civil', rooms: ['CIVIL CR 7'] },
+      { category: 'Facilities', rooms: ['HOD Office', 'Staff', 'Lobby', 'Lift', 'Common Room Girls', 'Girls Toilet'] }
+    ] 
+  },
+  { 
+    id: 'third', 
+    name: 'Third Floor', 
+    image: '/college/floor_third.jpeg', 
+    desc: 'Automobile & Data Science Departments', 
+    departments: [
+      { category: 'Workshops', rooms: ['Workshop 1', 'Workshop 2'] },
+      { category: 'Automobile Department', rooms: ['AUTO CR 1', 'AUTO CR 2', 'AUTO LAB 3 (CAD/CAM)', 'AUTO LAB 4 (TFP & MGF)', 'AUTO LAB 5 (Autotronics)', 'AUTO LAB 6 (Automotive System)', 'AUTO LAB 7'] },
+      { category: 'Exam Section', rooms: ['Exam Cell', 'Exam Cell 2'] },
+      { category: 'Data Science Department', rooms: ['DS CR 1', 'DS CR 2', 'DS CR 3', 'DS CR 4', 'DS TR 1'] },
+      { category: 'Data Science Labs', rooms: ['DS Lab 1', 'DS Lab 2', 'DS Lab 3', 'DS Lab 4', 'DS Lab 5A', 'DS Lab 5B', 'DS Lab 6A', 'DS Lab 6B'] },
+      { category: 'Facilities', rooms: ['HOD Office', 'Staff Cabin', 'Lobby', 'Lift', 'Girls Common Room', 'Girls Toilet', 'Boys Toilet'] }
+    ] 
+  },
+  { 
+    id: 'fourth', 
+    name: 'Fourth Floor', 
+    image: '/college/floor_fourth.jpeg', 
+    desc: 'Computer & IT Departments', 
+    departments: [
+      { category: 'Computer Department', rooms: ['COMP CR 1', 'COMP CR 2', 'COMP CR 3'] },
+      { category: 'Computer Labs', rooms: ['COMP LAB 1', 'COMP LAB 2', 'COMP LAB 3', 'COMP LAB 4', 'COMP LAB 5', 'COMP LAB 6'] },
+      { category: 'IT Department', rooms: ['IT CR 1', 'IT CR 2', 'IT CR 3'] },
+      { category: 'IT Labs', rooms: ['IT LAB 1', 'IT LAB 2', 'IT LAB 3', 'IT LAB 4', 'IT LAB 5', 'IT LAB 6', 'IT LAB 7'] },
+      { category: 'Other Rooms', rooms: ['COMP TR', 'IT TR 1', 'PROF Cabin', 'Office', 'HOD Office', 'Common Room Girls', 'Lobby', 'Lift'] },
+      { category: 'Seminar Halls', rooms: ['COMP Seminar Hall', 'IT Seminar Hall'] }
+    ] 
+  },
+  { 
+    id: 'fifth', 
+    name: 'Fifth Floor', 
+    image: '/college/floor_fifth.jpeg', 
+    desc: 'AI Classrooms & Labs', 
+    departments: [
+      { category: 'AI Classrooms', rooms: ['AI CR 1', 'AI CR 2', 'AI CR 3'] },
+      { category: 'AI Labs', rooms: ['AI LAB 1', 'AI LAB 2', 'AI LAB 3', 'AI LAB 4', 'AI LAB 5', 'AI LAB 6'] },
+      { category: 'Other Rooms', rooms: ['TPO', 'Discussion Group Room', 'Office (TPO Office)', 'Waiting Room'] },
+      { category: 'Administration', rooms: ['IQAC', 'R & D Cell', 'EN Cell 1', 'EN Cell 2', 'NSS'] },
+      { category: 'Facilities', rooms: ['Lecture Recording Room', 'Tutorial Room', 'Yoga Room', 'Lab 509', 'Students Recreation Area', 'Boys Toilet', 'Girls Toilet', 'Office + HOD', 'Maintenance', 'Lobby', 'Lift'] }
+    ] 
+  },
 ];
 
 const CLUBS = [
@@ -1100,26 +1180,61 @@ const StudentPortal = () => {
               </div>
 
               {/* Active floor */}
-              <Card className="bg-white overflow-hidden">
-                <div className="md:flex">
-                  <div className="md:w-1/2">
-                    <img src={FLOORS[activeFloor].image} alt={FLOORS[activeFloor].name}
-                      className="w-full h-64 md:h-full object-cover" />
-                  </div>
-                  <div className="md:w-1/2 p-6">
-                    <Badge className="bg-blue-100 text-blue-700 mb-3">{FLOORS[activeFloor].name}</Badge>
-                    <h3 className="text-lg font-bold mb-3">{FLOORS[activeFloor].name} Layout</h3>
-                    <div className="space-y-2">
-                      {FLOORS[activeFloor].desc.split(', ').map((item, i) => (
-                        <div key={i} className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg text-sm">
-                          <MapPin className="h-3.5 w-3.5 text-blue-500 shrink-0" />
-                          <span>{item}</span>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeFloor}
+                  initial={{ opacity: 0, scale: 0.98, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.98, y: -10 }}
+                  transition={{ duration: 0.4, ease: "easeOut" }}
+                >
+                  <Card className="bg-white overflow-hidden shadow-2xl border-0 ring-1 ring-gray-100/50 rounded-2xl">
+                    <div className="md:flex">
+                      <div className="md:w-5/12 relative group">
+                        <img src={FLOORS[activeFloor].image} alt={FLOORS[activeFloor].name}
+                          className="w-full h-72 md:h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-8 pointer-events-none">
+                          <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                          >
+                            <Badge className="bg-blue-600 border-0 mb-3 px-3 py-1 text-xs shadow-lg backdrop-blur-md bg-blue-600/90">{FLOORS[activeFloor].name}</Badge>
+                            <h3 className="text-3xl font-bold text-white shadow-sm leading-tight">{FLOORS[activeFloor].name} <br/><span className="text-blue-200">Layout</span></h3>
+                          </motion.div>
                         </div>
-                      ))}
+                      </div>
+                      <div className="md:w-7/12 p-6 md:p-8 bg-gradient-to-br from-gray-50 to-white">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-h-[500px] overflow-y-auto pr-3 
+                          scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
+                          {FLOORS[activeFloor].departments.map((dept, idx) => (
+                            <motion.div 
+                              key={idx}
+                              initial={{ opacity: 0, x: 30 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ duration: 0.4, delay: 0.1 + (idx * 0.1), ease: "backOut" }}
+                              className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all hover:border-blue-100 hover:-translate-y-1"
+                            >
+                              <h4 className="font-semibold text-blue-900 text-sm mb-3 border-b border-gray-100 pb-3 flex items-center gap-2">
+                                <Building2 className="h-4 w-4 text-blue-500" />
+                                {dept.category}
+                              </h4>
+                              <ul className="space-y-2">
+                                {dept.rooms.map((room, rIdx) => (
+                                  <li key={rIdx} className="flex items-start gap-2.5 text-sm text-gray-600 hover:text-gray-900 transition-colors">
+                                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0 shadow-sm" />
+                                    <span className="leading-snug">{room}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </motion.div>
+                          ))}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </Card>
+                  </Card>
+                </motion.div>
+              </AnimatePresence>
 
               {/* All floors overview */}
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
